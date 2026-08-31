@@ -24,6 +24,7 @@ bool saveToFile(string filename, string message, string key);
 bool loadFromFile(string filename, string& message, string& key);
 bool isValidHex(string hex);
 
+
 // Small RSA values for learning only
 const int RSA_P = 61;        // First prime
 const int RSA_Q = 53;        // Second prime
@@ -32,7 +33,9 @@ const int RSA_E = 17;        // Public exponent (coprime with phi(n))
 const int RSA_D = 2753;      // Private exponent (e*d ≡ 1 mod phi(n))
 // phi(n) = (p-1)(q-1) = 60*52 = 3120
 
+
 // Main program
+
 
 int main()
 {
@@ -40,12 +43,14 @@ int main()
     char continueChoice;
     bool running = true;
 
+
     // Keep showing the menu until the user exits.
     while (running)
     {
         displayMenu();
         cin >> choice;
         cin.ignore(1000, '\n');  // Clear the input line.
+
 
         // Make sure the choice is valid.
         while (choice < 1 || choice > 3)
@@ -55,6 +60,7 @@ int main()
             cin >> choice;
             cin.ignore(1000, '\n');
         }
+
 
         // Choose an operation.
         switch (choice)
@@ -66,36 +72,11 @@ int main()
                 DECRYPTION();
                 break;
             case 3:
-                cout << "\nThank you for using SecureX. Goodbye!\n\n";
-                running = false;  // Stop the loop.
-                break;
-        }
-
-        // Ask whether to do another operation.
-        if (running)
-        {
-            cout << "\nPerform another operation? (Y/N): ";
-            cin >> continueChoice;
-            cin.ignore(1000, '\n');
-
-            // Accept only Y or N.
-            while (continueChoice != 'Y' && continueChoice != 'y' &&
-                   continueChoice != 'N' && continueChoice != 'n')
-            {
-                cout << "[ERROR] Please enter Y or N: ";
-                cin >> continueChoice;
-                cin.ignore(1000, '\n');
-            }
-
-            // N means stop.
-            if (continueChoice == 'N' || continueChoice == 'n')
-            {
                 char deleteChoice;
-                cout << "Delete the saved results from securex_output.txt? (Y/N): ";
+                cout << "\nDelete the saved results from securex_output.txt? (Y/N): ";
                 cin >> deleteChoice;
                 cin.ignore(1000, '\n');
 
-                // Accept only Y or N.
                 while (deleteChoice != 'Y' && deleteChoice != 'y' &&
                        deleteChoice != 'N' && deleteChoice != 'n')
                 {
@@ -106,7 +87,6 @@ int main()
 
                 if (deleteChoice == 'Y' || deleteChoice == 'y')
                 {
-                    // trunc removes the old text from the file.
                     ofstream outputFile("securex_output.txt", ios::trunc);
 
                     if (!outputFile)
@@ -126,14 +106,82 @@ int main()
 
                 cout << "\nThank you for using SecureX. Goodbye!\n\n";
                 running = false;
+                break;
+        }
+
+
+        // Ask whether to do another operation.
+        if (running)
+        {
+            cout << "\nPerform another operation? (Y/N): ";
+            cin >> continueChoice;
+            cin.ignore(1000, '\n');
+
+
+            // Accept only Y or N.
+            while (continueChoice != 'Y' && continueChoice != 'y' &&
+                   continueChoice != 'N' && continueChoice != 'n')
+            {
+                cout << "[ERROR] Please enter Y or N: ";
+                cin >> continueChoice;
+                cin.ignore(1000, '\n');
+            }
+
+
+            // N means stop.
+            if (continueChoice == 'N' || continueChoice == 'n')
+            {
+                char deleteChoice;
+                cout << "Delete the saved results from securex_output.txt? (Y/N): ";
+                cin >> deleteChoice;
+                cin.ignore(1000, '\n');
+
+
+                // Accept only Y or N.
+                while (deleteChoice != 'Y' && deleteChoice != 'y' &&
+                       deleteChoice != 'N' && deleteChoice != 'n')
+                {
+                    cout << "[ERROR] Please enter Y or N: ";
+                    cin >> deleteChoice;
+                    cin.ignore(1000, '\n');
+                }
+
+
+                if (deleteChoice == 'Y' || deleteChoice == 'y')
+                {
+                    // trunc removes the old text from the file.
+                    ofstream outputFile("securex_output.txt", ios::trunc);
+
+
+                    if (!outputFile)
+                    {
+                        cout << "Error: Unable to clear output file.\n";
+                    }
+                    else
+                    {
+                        outputFile.close();
+                        cout << "Saved results have been deleted.\n";
+                    }
+                }
+                else
+                {
+                    cout << "Saved results will be kept.\n";
+                }
+
+
+                cout << "\nThank you for using SecureX. Goodbye!\n\n";
+                running = false;
             }
         }
     }
 
+
     return 0;  // End successfully.
 }
 
+
 // Display the menu
+
 
 void displayMenu()
 {
@@ -147,15 +195,19 @@ void displayMenu()
     cout << "Enter choice: ";
 }
 
+
 // Encryption workflow:
 // Vigenere -> XOR -> hexadecimal
+
 
 void ENCRYPTION()
 {
     string plaintext, secretKey, intermediateText, xorResult, hexEncrypted, encryptedKey;
     bool validInput = false;
 
+
     cout << "\n--- ENCRYPTION MODULE ---\n";
+
 
     // Get both inputs and check that they are not empty.
     while (!validInput)
@@ -163,8 +215,10 @@ void ENCRYPTION()
         cout << "Enter plaintext message: ";
         getline(cin, plaintext);
 
+
         cout << "Enter secret key: ";
         getline(cin, secretKey);
+
 
         // Both inputs are needed.
         if (plaintext.empty() || secretKey.empty())
@@ -178,23 +232,28 @@ void ENCRYPTION()
         }
     }
 
+
     // First layer: Vigenere encryption.
     cout << "\n[Processing] Applying Vigenère encryption...\n";
     intermediateText = vigenereEncrypt(plaintext, secretKey);
     cout << "Intermediate ciphertext (first 50 chars): ";
     cout << intermediateText.substr(0, min(50, (int)intermediateText.length())) << "...\n";
 
+
     // Second layer: XOR with the key.
     cout << "[Processing] Applying XOR transformation...\n";
     xorResult = xorTransform(intermediateText, secretKey);
+
 
     // Hex makes the binary result readable.
     cout << "[Processing] Encoding to hexadecimal...\n";
     hexEncrypted = encodeToHex(xorResult);
 
+
     // Protect the key with RSA.
     cout << "[Processing] Encrypting secret key with RSA...\n";
     encryptedKey = RSA_ENCRYPT_KEY(secretKey, RSA_E, RSA_N);
+
 
     // Show the results in the terminal.
     cout << "\n==========================\n";
@@ -205,6 +264,7 @@ void ENCRYPTION()
     cout << "Encrypted Message (Hex):\n" << hexEncrypted << "\n\n";
     cout << "RSA-Encrypted Secret Key:\n" << encryptedKey << "\n";
     cout << "==========================\n";
+
 
     // Append the same results to the output file.
     ofstream outputFile("securex_output.txt", ios::app);
@@ -226,19 +286,23 @@ void ENCRYPTION()
     }
 }
 
+
 // Vigenere encryption
 // Each letter is shifted using the repeating key.
+
 
 string vigenereEncrypt(string plaintext, string key)
 {
     string ciphertext = "";
     int keyIndex = 0;
 
+
     // Check each plaintext character.
     for (int i = 0; i < plaintext.length(); i++)
     {
         char plainChar = plaintext[i];
         char keyChar = key[keyIndex % key.length()];  // Repeat the key.
+
 
         // Shift letters only.
         if (isalpha(plainChar))
@@ -265,22 +329,27 @@ string vigenereEncrypt(string plaintext, string key)
         }
     }
 
+
     return ciphertext;
 }
 
+
 // Vigenere decryption
 // Subtract the same shift used during encryption.
+
 
 string vigenereDecrypt(string ciphertext, string key)
 {
     string plaintext = "";
     int keyIndex = 0;
 
+
     // Process each character in ciphertext
     for (int i = 0; i < ciphertext.length(); i++)
     {
         char cipherChar = ciphertext[i];
         char keyChar = key[keyIndex % key.length()];
+
 
         if (isalpha(cipherChar))
         {
@@ -303,15 +372,19 @@ string vigenereDecrypt(string ciphertext, string key)
         }
     }
 
+
     return plaintext;
 }
+
 
 // XOR transformation
 // Using the same key again gets the original data back.
 
+
 string xorTransform(string data, string key)
 {
     string result = "";
+
 
     for (int i = 0; i < data.length(); i++)
     {
@@ -321,32 +394,41 @@ string xorTransform(string data, string key)
         result += xorResult;
     }
 
+
     return result;
 }
 
+
 // Convert bytes into readable hexadecimal text.
+
 
 string encodeToHex(string data)
 {
     string hexOutput = "";
 
+
     for (int i = 0; i < data.length(); i++)
     {
         unsigned char byte = (unsigned char)data[i];
+
 
         // One byte becomes two hex digits.
         hexOutput += decimalToHex(byte / 16);  // First digit.
         hexOutput += decimalToHex(byte % 16);  // Second digit.
     }
 
+
     return hexOutput;
 }
 
+
 // Convert hexadecimal text back into bytes.
+
 
 string decodeFromHex(string hexData)
 {
     string result = "";
+
 
     // Read two hex digits at a time.
     for (int i = 0; i < hexData.length(); i += 2)
@@ -357,6 +439,7 @@ string decodeFromHex(string hexData)
             int highNibble = hexToDecimal(hexData.substr(i, 1));
             int lowNibble = hexToDecimal(hexData.substr(i + 1, 1));
 
+
             if (highNibble >= 0 && lowNibble >= 0)
             {
                 int byte = highNibble * 16 + lowNibble;
@@ -365,15 +448,19 @@ string decodeFromHex(string hexData)
         }
     }
 
+
     return result;
 }
 
+
 // Convert one decimal digit to hex.
+
 
 string decimalToHex(int decimal)
 {
     if (decimal < 0 || decimal > 15)
         return "";
+
 
     if (decimal < 10)
         return string(1, '0' + decimal);
@@ -381,14 +468,18 @@ string decimalToHex(int decimal)
         return string(1, 'A' + (decimal - 10));
 }
 
+
 // Convert one hex digit to decimal.
+
 
 int hexToDecimal(string hex)
 {
     if (hex.empty())
         return -1;
 
+
     char hexChar = toupper(hex[0]);
+
 
     if (hexChar >= '0' && hexChar <= '9')
         return hexChar - '0';
@@ -398,12 +489,15 @@ int hexToDecimal(string hex)
         return -1;  // Invalid digit.
 }
 
+
 // Encrypt the secret key with RSA.
 // Formula: C = M^e mod n
+
 
 string RSA_ENCRYPT_KEY(string secretKey, int e, int n)
 {
     string encryptedKey = "";
+
 
     // Encrypt one character at a time.
     for (int i = 0; i < secretKey.length(); i++)
@@ -411,8 +505,10 @@ string RSA_ENCRYPT_KEY(string secretKey, int e, int n)
         // Use the character's ASCII value.
         int plainValue = (int)secretKey[i];
 
+
         // Apply the RSA formula.
         long long cipherValue = modPow(plainValue, e, n);
+
 
         // Convert the result to hex.
         string hexVal = "";
@@ -432,27 +528,34 @@ string RSA_ENCRYPT_KEY(string secretKey, int e, int n)
             }
         }
 
+
         // Use four digits so every value has the same length.
         while (hexVal.length() < 4)
             hexVal = "0" + hexVal;
 
+
         encryptedKey += hexVal;
+
 
         // Separate values with spaces.
         if (i < secretKey.length() - 1)
             encryptedKey += " ";
     }
 
+
     return encryptedKey;
 }
 
+
 // Decrypt the RSA-protected key.
 // Formula: M = C^d mod n
+
 
 string RSA_DECRYPT_KEY(string encryptedKey, int d, int n)
 {
     string recoveredKey = "";
     int startPos = 0;
+
 
     // Read each space-separated value.
     for (int i = 0; i <= encryptedKey.length(); i++)
@@ -463,6 +566,7 @@ string RSA_DECRYPT_KEY(string encryptedKey, int d, int n)
             if (i > startPos)
             {
                 string hexValue = encryptedKey.substr(startPos, i - startPos);
+
 
                 // Change the hex value into a number.
                 long long cipherValue = 0;
@@ -477,26 +581,33 @@ string RSA_DECRYPT_KEY(string encryptedKey, int d, int n)
                         cipherValue += c - 'a' + 10;
                 }
 
+
                 // Apply the RSA decryption formula.
                 long long plainValue = modPow(cipherValue, d, n);
+
 
                 // Change the ASCII value back to a character.
                 recoveredKey += char(plainValue);
             }
 
+
             startPos = i + 1;
         }
     }
 
+
     return recoveredKey;
 }
 
+
 // Calculate (base^exp) mod mod without making huge numbers.
+
 
 long long modPow(long long base, long long exp, long long mod)
 {
     long long result = 1;
     base = base % mod;
+
 
     // Repeatedly square the base.
     while (exp > 0)
@@ -505,28 +616,35 @@ long long modPow(long long base, long long exp, long long mod)
         if (exp % 2 == 1)
             result = (result * base) % mod;
 
+
         // Halve the exponent and square the base.
         exp = exp >> 1;  // Right shift divides by 2.
         base = (base * base) % mod;
     }
 
+
     return result;
 }
 
+
 // Decryption reverses the encryption steps.
+
 
 void DECRYPTION()
 {
     string hexEncrypted, encryptedKeyStr, recoveredKey, xorResult, plaintext;
     bool validInput = false;
 
+
     cout << "\n--- DECRYPTION MODULE ---\n";
+
 
     // The user can load the data from a file.
     char loadChoice;
     cout << "Load encrypted data from file? (Y/N): ";
     cin >> loadChoice;
     cin.ignore(1000, '\n');
+
 
     // Keep asking until the answer is Y or N.
     while (loadChoice != 'Y' && loadChoice != 'y' &&
@@ -537,11 +655,13 @@ void DECRYPTION()
         cin.ignore(1000, '\n');
     }
 
+
     if (loadChoice == 'Y' || loadChoice == 'y')
     {
         string filename;
         cout << "Enter filename: ";
         getline(cin, filename);
+
 
         if (loadFromFile(filename, hexEncrypted, encryptedKeyStr))
         {
@@ -555,14 +675,17 @@ void DECRYPTION()
         }
     }
 
+
     // Otherwise, enter both values manually.
     while (!validInput)
     {
         cout << "Enter encrypted hexadecimal message: ";
         getline(cin, hexEncrypted);
 
+
         cout << "Enter RSA-encrypted secret key: ";
         getline(cin, encryptedKeyStr);
+
 
         // Both values are required.
         if (hexEncrypted.empty() || encryptedKeyStr.empty())
@@ -581,22 +704,27 @@ void DECRYPTION()
         }
     }
 
+
     // Recover the secret key first.
     cout << "\n[Processing] Decrypting secret key with RSA...\n";
     recoveredKey = RSA_DECRYPT_KEY(encryptedKeyStr, RSA_D, RSA_N);
     cout << "Recovered secret key: " << recoveredKey << "\n";
 
+
     // Change the hex message back to bytes.
     cout << "[Processing] Decoding from hexadecimal...\n";
     string xorEncrypted = decodeFromHex(hexEncrypted);
+
 
     // XOR again to undo the first XOR.
     cout << "[Processing] Applying XOR transformation...\n";
     string vigenereEncrypted = xorTransform(xorEncrypted, recoveredKey);
 
+
     // Undo the Vigenere encryption.
     cout << "[Processing] Applying Vigenère decryption...\n";
     plaintext = vigenereDecrypt(vigenereEncrypted, recoveredKey);
+
 
     // Show the results in the terminal.
     cout << "\n==========================\n";
@@ -607,6 +735,7 @@ void DECRYPTION()
     cout << "Recovered Secret Key:\n" << recoveredKey << "\n\n";
     cout << "Recovered Plaintext:\n" << plaintext << "\n";
     cout << "==========================\n";
+
 
     // Append the same results to the output file.
     ofstream outputFile("securex_output.txt", ios::app);
@@ -628,14 +757,18 @@ void DECRYPTION()
     }
 }
 
+
 // File input and output
+
 
 bool saveToFile(string filename, string message, string key)
 {
     ofstream outFile(filename);
 
+
     if (!outFile.is_open())
         return false;
+
 
     // Save the message and key in a simple text format.
     outFile << "--- SECUREX ENCRYPTED DATA ---\n";
@@ -644,20 +777,25 @@ bool saveToFile(string filename, string message, string key)
     outFile << "RSA-ENCRYPTED SECRET KEY:\n";
     outFile << key << "\n";
 
+
     outFile.close();
     return true;
 }
+
 
 bool loadFromFile(string filename, string& message, string& key)
 {
     ifstream inFile(filename);
 
+
     if (!inFile.is_open())
         return false;
+
 
     string line;
     bool readingMessage = false;
     bool readingKey = false;
+
 
     // Read the latest message and key from the saved results.
     while (getline(inFile, line))
@@ -687,11 +825,14 @@ bool loadFromFile(string filename, string& message, string& key)
         }
     }
 
+
     inFile.close();
     return (!message.empty() && !key.empty());
 }
 
+
 // Check whether a string contains valid hex characters.
+
 
 bool isValidHex(string hex)
 {
@@ -703,3 +844,6 @@ bool isValidHex(string hex)
     }
     return true;
 }
+
+
+
