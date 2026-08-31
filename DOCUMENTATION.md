@@ -72,56 +72,127 @@ int main()
     int choice;
     char continueChoice;
     bool running = true;
-    
-    while (running)  // Main program loop - keeps program alive
+
+    // Keep showing the menu until the user exits.
+    while (running)
     {
         displayMenu();
         cin >> choice;
-        cin.ignore();  // Clear newline from input buffer
-        
-        // Validate menu choice (1-3)
+        cin.ignore(1000, '\n');  // Clear the input line.
+
+        // Make sure the choice is valid.
         while (choice < 1 || choice > 3)
         {
-            cout << "[ERROR] Invalid choice! Please enter 1, 2, or 3.\n";
+            cout << "\n[ERROR] Invalid choice! Please enter 1, 2, or 3.\n";
+            cout << "Enter your choice: ";
             cin >> choice;
-            cin.ignore();
+            cin.ignore(1000, '\n');
         }
-        
-        // Switch statement routes to correct function
+
+        // Choose an operation.
         switch (choice)
         {
-            case 1: ENCRYPTION(); break;
-            case 2: DECRYPTION(); break;
-            case 3: 
-                cout << "Thank you for using SecureX. Goodbye!\n";
-                running = false;  // Exit loop
+            case 1:
+                ENCRYPTION();
+                break;
+            case 2:
+                DECRYPTION();
+                break;
+            case 3:
+                char deleteChoice;
+                cout << "\nDelete the saved results from securex_output.txt? (Y/N): ";
+                cin >> deleteChoice;
+                cin.ignore(1000, '\n');
+
+                while (deleteChoice != 'Y' && deleteChoice != 'y' &&
+                       deleteChoice != 'N' && deleteChoice != 'n')
+                {
+                    cout << "[ERROR] Please enter Y or N: ";
+                    cin >> deleteChoice;
+                    cin.ignore(1000, '\n');
+                }
+
+                if (deleteChoice == 'Y' || deleteChoice == 'y')
+                {
+                    ofstream outputFile("securex_output.txt", ios::trunc);
+
+                    if (!outputFile)
+                    {
+                        cout << "Error: Unable to clear output file.\n";
+                    }
+                    else
+                    {
+                        outputFile.close();
+                        cout << "Saved results have been deleted.\n";
+                    }
+                }
+                else
+                {
+                    cout << "Saved results will be kept.\n";
+                }
+
+                cout << "\nThank you for using SecureX. Goodbye!\n\n";
+                running = false;
                 break;
         }
-        
-        // After operation, ask if user wants to continue
+
+        // Ask whether to do another operation.
         if (running)
         {
             cout << "\nPerform another operation? (Y/N): ";
             cin >> continueChoice;
-            cin.ignore();
-            
-            // Validate Y/N input
+            cin.ignore(1000, '\n');
+
+            // Accept only Y or N.
             while (continueChoice != 'Y' && continueChoice != 'y' &&
                    continueChoice != 'N' && continueChoice != 'n')
             {
                 cout << "[ERROR] Please enter Y or N: ";
                 cin >> continueChoice;
-                cin.ignore();
+                cin.ignore(1000, '\n');
             }
-            
+            // N means stop.
             if (continueChoice == 'N' || continueChoice == 'n')
             {
-                running = false;  // Exit program
+                char deleteChoice;
+                cout << "Delete the saved results from securex_output.txt? (Y/N): ";
+                cin >> deleteChoice;
+                cin.ignore(1000, '\n');
+
+                // Accept only Y or N.
+                while (deleteChoice != 'Y' && deleteChoice != 'y' &&
+                       deleteChoice != 'N' && deleteChoice != 'n')
+                {
+                    cout << "[ERROR] Please enter Y or N: ";
+                    cin >> deleteChoice;
+                    cin.ignore(1000, '\n');
+                }
+
+                if (deleteChoice == 'Y' || deleteChoice == 'y')
+                {
+                    // trunc removes the old text from the file.
+                    ofstream outputFile("securex_output.txt", ios::trunc);
+                    if (!outputFile)
+                    {
+                        cout << "Error: Unable to clear output file.\n";
+                    }
+                    else
+                    {
+                        outputFile.close();
+                        cout << "Saved results have been deleted.\n";
+                    }
+                }
+                else
+                {
+                    cout << "Saved results will be kept.\n";
+                }
+
+                cout << "\nThank you for using SecureX. Goodbye!\n\n";
+                running = false;
             }
         }
     }
-    
-    return 0;
+    return 0;  // End successfully.
 }
 ```
 
